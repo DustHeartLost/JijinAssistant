@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import re
+import json
 
 
 class Funds:
@@ -39,7 +40,9 @@ if __name__ == "__main__":
     v = time.strftime(r'%Y%m%d%H%M%S')
     url = f"http://fund.eastmoney.com/pingzhongdata/{fundCode}.js?v={v}"
     fundData = requests.get(url).text
-    Data_currentFundManager = re.findall(
-        "var Data_currentFundManager = .;", fundData, 0)
+    
+    # 现任基金经理的基本信息
+    Data_currentFundManager = json.loads(re.findall(
+        r"var Data_currentFundManager =([^;]*)", fundData, 0)[0])
 
-    print(aa)
+    print(Data_currentFundManager)
