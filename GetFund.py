@@ -138,22 +138,44 @@ class Funds:
         return Data_heavyBonds
 
     def isDuplicationInHeavy(self, fundCodes, way=1):
+        """根据基金代码序列，查找基金直接持仓是否有重叠
+
+        Args:
+            fundCodes (List)): 基金代码列表
+            way (int, optional): 若基金重仓是股票，way为1，若基金重仓是债券，way为2. Defaults to 1.
+
+        Returns:
+            [String]: 若有重叠返回重叠具体信息，否则返回False
+        """
         Data = {}
         for code in fundCodes:
-            Data[code] = self.findFundHeavyStock(
-                code) if way == 1 else self.findFundHeavyBonds(code)
-
+            Data[code] = self.findFundHeavyStock if way == 1 else self.findFundHeavyBonds(
+                code)
         msg = ""
-        # for i=0 in range(len(fundCodes)):
-        # for j=i+1 in range(len(fundCodes)):
-        #   if self.isDuplicationInlist(Data[fundCodes[i],fundCodes[j]]):
+        for i in range(len(fundCodes)):
+            for j in range(i+1, len(fundCodes)):
+                temp = self.isDuplicationInlist(
+                    Data[fundCodes[i]], Data[fundCodes[j]])
+                if temp:
+                    msg = msg+f"{fundCodes[i]},{fundCodes[j]}: "+temp+"\n"
+
+        return msg if msg != "" else False
 
     def isDuplicationInlist(self, list1, list2):
+        """根据给定的两个列表，判断第一个列表的内容是否出现在第二个列表中
+
+        Args:
+            list1 (List): 第一个列表
+            list2 (List): 第二个列表
+
+        Returns:
+            [String]: 若第一个列表内容出现在第二个列表中，则返回具体内容，否则返回False
+        """
         msg = ""
         for templist1 in list1:
             for templist2 in list2:
-                if templist1 == templist2:
-                    msg += templist1
+                if templist1["code"] == templist2["code"]:
+                    msg = msg+templist1["name"]
         return False if msg == "" else msg
 
 
@@ -162,7 +184,7 @@ if __name__ == "__main__":
     fundCode = "000033"
     v = time.strftime(r'%Y%m%d%H%M%S')
     fund = Funds()
-    # print(fund.findFundManager(fundCode))
-    print(fund.findFundInformation(fundCode))
+    print(fund.isDuplicationInHeavy(fundCodes=["161120", "000033"], way=2))
+    # print(fund.findFundInformation(fundCode))
     # print(fund.findFundHeavyStock(fundCode))
     # print(fund.findFundHeavyBonds(fundCode))
