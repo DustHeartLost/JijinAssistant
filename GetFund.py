@@ -101,10 +101,34 @@ class Funds:
             Data_heavyStock.append(tempData)
         return Data_heavyStock
 
+    def findFundHeavyBonds(self,fundCode):
+        """根据基金代码查找基金的重仓债券
+
+        Args:
+            fundCode (String): 基金代码
+
+        Returns:
+            List: 重仓债券信息的字典对象列表
+        """
+        url=f'http://fundf10.eastmoney.com/FundArchivesDatas.aspx?type=zqcc&code={fundCode}&topline=20'
+        fundData = requests.get(url).text
+        html = re.findall(r"content:\"(.*)\",arryear", fundData, 0)[0]
+        table = BeautifulSoup(html, "html.parser").find(
+            "table", attrs={"class": "w782 comm tzxq"})
+        trs = table.find_all("tr")
+        Data_heavyBonds = []
+        theads = trs[0].find_all("th")
+        for i in range(1,len(trs)):
+            tds = trs[i].find_all("td")
+            tempData={}
+            for j in range(len(tds)):
+                tempData[theads[j].text] = tds[j].text
+            Data_heavyBonds.append(tempData)
+        return Data_heavyBonds
 
 if __name__ == "__main__":
     # TODO: 完善后续的各个字段的取值
-    fundCode = "001595"
+    fundCode = "000033"
     v = time.strftime(r'%Y%m%d%H%M%S')
     fund = Funds()
-    print(fund.findFundHeavyStock(fundCode))
+    print(fund.findFundHeavyBonds(fundCode))
